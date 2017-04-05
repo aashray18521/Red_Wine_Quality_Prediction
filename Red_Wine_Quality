@@ -1,0 +1,44 @@
+import pandas as pd
+import numpy as np
+#importing the dataset
+X = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv", sep=';',header=None)
+
+#rearranging dataset for our use
+X = pd.DataFrame(X.iloc[1:,:])
+y = pd.DataFrame(X.iloc[0:,11])
+
+#importing pipeline and scale
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import scale
+
+#scaling the data
+X_scaled = scale(X)
+
+#importing standardscaler and kneighborclassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+scaler = StandardScaler()
+knn = KNeighborsClassifier()
+
+#arranging data into steps for pipeline
+steps = [('scaler',StandardScaler()),('knn',KNeighborsClassifier())]
+
+#adding steps to pipeline
+pipeline = Pipeline(steps)
+
+#splitting our data
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 21)
+
+#fitting data to pipeline
+knn_scaled = pipeline.fit(X_train, y_train)
+
+#prediction using pipeline
+y_pred = pipeline.predict(X_test)
+
+#Calculating score for scaled data
+print(knn_scaled.score(X_test, y_test))
+
+#Calculating score for unscaled data
+knn_unscaled = knn.fit(X_train,y_train)
+print(knn_unscaled.score(X_test, y_test))
